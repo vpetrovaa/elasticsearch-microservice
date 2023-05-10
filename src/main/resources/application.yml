@@ -1,10 +1,12 @@
 server:
-  port: 8078
+  port: 8077
 spring:
   application:
-    name: note
+    name: esearch
   config:
     import: optional:file:.env[.properties]
+    main:
+      allow-bean-definition-overriding: true
 
 eureka:
   client:
@@ -14,7 +16,6 @@ eureka:
 
 kafka:
   topic: notes
-  partitions: 10
-  replicas: 1
+  group: json
   port: ${KAFKA_HOST}:9092
-  key: ${KAFKA_KEY}
+
