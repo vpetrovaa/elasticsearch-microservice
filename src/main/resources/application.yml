@@ -19,3 +19,6 @@ kafka:
   group: json
   port: ${KAFKA_HOST}:9092
 
+elastic:
+  host: ${ELASTIC_HOST}
+
