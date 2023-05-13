@@ -16,10 +16,13 @@ public class ElasticsearchConfig{
     @Value("${elastic.host}")
     private String elasticHost;
 
+    @Value("${elastic.port}")
+    private int elasticPort;
+
     @Bean
     public RestClient getRestClient() {
         RestClient restClient = RestClient.builder(
-                new HttpHost(elasticHost, 9200)).build();
+                new HttpHost(elasticHost, elasticPort)).build();
         return restClient;
     }
 

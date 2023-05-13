@@ -21,4 +21,5 @@ kafka:
 
 elastic:
   host: ${ELASTIC_HOST}
+  port: 9200
 
