@@ -42,7 +42,6 @@ public class KfConsumerConfig {
         ConcurrentKafkaListenerContainerFactory<String, NoteEvent> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
-
         return factory;
     }
 
