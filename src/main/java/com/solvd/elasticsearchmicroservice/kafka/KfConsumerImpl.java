@@ -19,28 +19,13 @@ public class KfConsumerImpl implements KfConsumer{
     public void receive(NoteEvent event) {
         log.info("Message received -> {}", event);
         switch (event.getType()) {
-            case PUT -> update(generateNote(event));
-            case POST -> create(generateNote(event));
-            case DELETE -> delete(event.getId());
+            case PUT -> noteService.update(toNote(event));
+            case POST -> noteService.create(toNote(event));
+            case DELETE -> noteService.delete(event.getId());
         }
     }
 
-    @Override
-    public void create(Note note) {
-        noteService.create(note);
-    }
-
-    @Override
-    public void update(Note note) {
-        noteService.update(note);
-    }
-
-    @Override
-    public void delete(Long id) {
-        noteService.delete(id);
-    }
-
-    private Note generateNote(NoteEvent event){
+    private Note toNote(NoteEvent event){
         Note note = new Note();
         note.setId(event.getId());
         note.setTag(event.getTag());
