@@ -1,38 +1,36 @@
 package com.solvd.elasticsearchmicroservice.kafka;
 
-import com.solvd.elasticsearchmicroservice.domain.Note;
 import com.solvd.elasticsearchmicroservice.kafka.event.NoteEvent;
-import com.solvd.elasticsearchmicroservice.service.NoteService;
+import com.solvd.elasticsearchmicroservice.kafka.handler.DeleteHandler;
+import com.solvd.elasticsearchmicroservice.kafka.handler.Handler;
+import com.solvd.elasticsearchmicroservice.kafka.handler.PostHandler;
+import com.solvd.elasticsearchmicroservice.kafka.handler.PutHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class KfConsumerImpl implements KfConsumer{
 
-    private final NoteService noteService;
+    private final PostHandler postHandler;
+    private final PutHandler putHandler;
+    private final DeleteHandler deleteHandler;
+
+    private final Map<String, Handler> processors = new HashMap<>();
 
     @KafkaListener(topics = "${kafka.topic}", groupId = "groupId", containerFactory = "kafkaListenerContainerFactory")
     public void receive(NoteEvent event) {
         log.info("Message received -> {}", event);
-        switch (event.getType()) {
-            case PUT -> noteService.update(toNote(event));
-            case POST -> noteService.create(toNote(event));
-            case DELETE -> noteService.delete(event.getId());
-        }
-    }
-
-    private Note toNote(NoteEvent event){
-        Note note = new Note();
-        note.setId(event.getId());
-        note.setTag(event.getTag());
-        note.setDescription(event.getDescription());
-        note.setTheme(event.getTheme());
-        note.setUserId(event.getUserId());
-        return note;
+        processors.put("POST", postHandler);
+        processors.put("PUT", putHandler);
+        processors.put("DELETE",  deleteHandler);
+        processors.get(event.getType()).handle(event);
     }
 
 }
