@@ -22,15 +22,18 @@ public class KfConsumerImpl implements KfConsumer{
     private final PutHandler putHandler;
     private final DeleteHandler deleteHandler;
 
-    private final Map<String, Handler> processors = new HashMap<>();
-
     @KafkaListener(topics = "${kafka.topic}", groupId = "groupId", containerFactory = "kafkaListenerContainerFactory")
     public void receive(NoteEvent event) {
         log.info("Message received -> {}", event);
+        getHandlers().get(event.getType()).handle(event);
+    }
+
+    private Map<String, Handler> getHandlers() {
+        Map<String, Handler> processors = new HashMap<>();
         processors.put("POST", postHandler);
         processors.put("PUT", putHandler);
         processors.put("DELETE",  deleteHandler);
-        processors.get(event.getType()).handle(event);
+        return processors;
     }
 
 }
