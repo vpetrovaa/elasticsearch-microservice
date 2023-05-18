@@ -2,14 +2,14 @@ package com.solvd.elasticsearchmicroservice.kafka.handler.impl;
 
 import com.solvd.elasticsearchmicroservice.domain.Note;
 import com.solvd.elasticsearchmicroservice.kafka.event.NoteEvent;
-import com.solvd.elasticsearchmicroservice.kafka.handler.PutHandler;
+import com.solvd.elasticsearchmicroservice.kafka.handler.Handler;
 import com.solvd.elasticsearchmicroservice.service.NoteService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component("PUT")
 @RequiredArgsConstructor
-public class PutHandlerImpl implements PutHandler {
+public class PutHandlerImpl implements Handler {
 
     private final NoteService noteService;
 

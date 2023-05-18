@@ -1,14 +1,14 @@
 package com.solvd.elasticsearchmicroservice.kafka.handler.impl;
 
 import com.solvd.elasticsearchmicroservice.kafka.event.NoteEvent;
-import com.solvd.elasticsearchmicroservice.kafka.handler.DeleteHandler;
+import com.solvd.elasticsearchmicroservice.kafka.handler.Handler;
 import com.solvd.elasticsearchmicroservice.service.NoteService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component("DELETE")
 @RequiredArgsConstructor
-public class DeleteHandlerImpl implements DeleteHandler {
+public class DeleteHandlerImpl implements Handler {
 
     private final NoteService noteService;
 

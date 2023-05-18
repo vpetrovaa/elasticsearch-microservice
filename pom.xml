@@ -23,6 +23,8 @@
 		<mapstruct.version>1.5.2.Final</mapstruct.version>
 		<eureka.version>4.0.0</eureka.version>
 		<elascticsearch.version>5.0.3</elascticsearch.version>
+		<junit.version>5.8.1</junit.version>
+		<mockito.version>4.6.1</mockito.version>
 	</properties>
 
 	<dependencies>
@@ -66,6 +68,27 @@
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-elasticsearch</artifactId>
 			<version>${elascticsearch.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>${mockito.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-junit-jupiter</artifactId>
+			<version>${mockito.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
 		</dependency>
 
 	</dependencies>
