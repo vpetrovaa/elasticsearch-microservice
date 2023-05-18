@@ -2,12 +2,15 @@ package com.solvd.elasticsearchmicroservice.web.controller;
 
 import com.solvd.elasticsearchmicroservice.domain.Note;
 import com.solvd.elasticsearchmicroservice.service.NoteService;
+import com.solvd.elasticsearchmicroservice.web.dto.NoteDto;
+import com.solvd.elasticsearchmicroservice.web.dto.criteria.NoteCriteriaDto;
+import com.solvd.elasticsearchmicroservice.web.mapper.NoteCriteriaMapper;
+import com.solvd.elasticsearchmicroservice.web.mapper.NoteMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +20,8 @@ import java.util.Optional;
 public class ElasticsearchController {
 
     private final NoteService noteService;
+    private final NoteCriteriaMapper noteCriteriaMapper;
+    private final NoteMapper noteMapper;
 
     @GetMapping("/users/{userId}")
     public List<Note> findAllByUserId(@PathVariable("userId") Long userId) {
@@ -32,6 +37,16 @@ public class ElasticsearchController {
     public Optional<Note> findById(@PathVariable("id") Long id) {
         Optional<Note> note = noteService.findById(id);
         return note;
+    }
+
+
+    @GetMapping(value = "/search")
+    public List<NoteDto> findByCriteriaOrdered(@RequestParam(required = false) Integer currentPage,
+                                               @RequestBody(required = false) @Validated NoteCriteriaDto criteria,
+                                               @RequestParam(required = false) String orderingField) {
+        List<Note> notes =  noteService.findByCriteriaOrdered(currentPage,
+                noteCriteriaMapper.toEntity(criteria), orderingField);
+        return noteMapper.toDtoList(notes);
     }
 
     @GetMapping("/exists/{id}")

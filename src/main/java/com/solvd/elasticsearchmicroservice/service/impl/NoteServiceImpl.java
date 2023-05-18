@@ -1,12 +1,23 @@
 package com.solvd.elasticsearchmicroservice.service.impl;
 
 import com.solvd.elasticsearchmicroservice.domain.Note;
+import com.solvd.elasticsearchmicroservice.domain.criteria.NoteCriteria;
+import com.solvd.elasticsearchmicroservice.domain.criteria.OrderFields;
 import com.solvd.elasticsearchmicroservice.repository.NoteRepository;
 import com.solvd.elasticsearchmicroservice.service.NoteService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.query.Criteria;
+import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
+import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,7 +25,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class NoteServiceImpl implements NoteService {
 
+    private static final int PAGE_SIZE = 5;
+
     private final NoteRepository noteRepository;
+    private final ElasticsearchOperations operations;
 
     @Override
     public Note create(Note note) {
@@ -37,6 +51,43 @@ public class NoteServiceImpl implements NoteService {
         List<Note> notes = new ArrayList<>();
         iterable.forEach(notes::add);
         return notes;
+    }
+
+    @Override
+    public List<Note> findByCriteriaOrdered(Integer currentPage, NoteCriteria noteCriteria,
+                                            String orderingField) {
+        Criteria criteria = new Criteria();
+        if (noteCriteria.getTags() != null && !noteCriteria.getTags().isEmpty()) {
+            criteria.and(Criteria.where("tag")).in(noteCriteria.getTags());
+        }
+        if (noteCriteria.getThemes() != null && !noteCriteria.getThemes().isEmpty()) {
+            criteria.and(Criteria.where("theme")).in(noteCriteria.getThemes());
+        }
+        if (noteCriteria.getKeyWord() != null) {
+            criteria.and(Criteria.where("tag")).contains(noteCriteria.getKeyWord());
+            criteria.and(Criteria.where("theme")).contains(noteCriteria.getKeyWord());
+            criteria.and(Criteria.where("description")).contains(noteCriteria.getKeyWord());
+        }
+        Pageable pageable;
+        if (currentPage != null) {
+            pageable = PageRequest.of(currentPage, PAGE_SIZE);
+        } else {
+            pageable = PageRequest.of(0, PAGE_SIZE);
+        }
+        boolean isOrdered = false;
+        if (orderingField != null) {
+            isOrdered = Arrays.stream(OrderFields.values())
+                    .map(Enum::name)
+                    .anyMatch(f -> f.equals(orderingField));
+        }
+        Query query = new CriteriaQuery(criteria, pageable);
+        if (isOrdered) {
+            query.addSort(Sort.by(orderingField).ascending());
+        }
+        return operations.search(query, Note.class).
+                stream()
+                .map(SearchHit::getContent)
+                .toList();
     }
 
     @Override
