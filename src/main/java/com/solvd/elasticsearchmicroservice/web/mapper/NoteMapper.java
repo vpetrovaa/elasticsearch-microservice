@@ -14,4 +14,5 @@ public interface NoteMapper {
     Note toEntity(NoteDto noteDto);
 
     List<NoteDto> toDtoList(List<Note> notes);
+
 }
