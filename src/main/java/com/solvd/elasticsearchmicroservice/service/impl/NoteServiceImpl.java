@@ -73,21 +73,9 @@ public class NoteServiceImpl implements NoteService {
         if (noteCriteria.getThemes() != null && !noteCriteria.getThemes().isEmpty()) {
             criteria.and(Criteria.where("notes.theme.keyword")).in(noteCriteria.getThemes());
         }
-        Pageable pageable;
-        if (currentPage != null) {
-            pageable = PageRequest.of(currentPage, PAGE_SIZE);
-        } else {
-            pageable = PageRequest.of(0, PAGE_SIZE);
-        }
-        boolean isOrdered = false;
-        if (orderingField != null) {
-            isOrdered = Arrays.stream(OrderFields.values())
-                    .map(Enum::name)
-                    .anyMatch(f -> f.equals(orderingField));
-        }
+        Pageable pageable = getPageable(currentPage);
+        boolean isOrdered = isOrdered(orderingField);
         Query query = new CriteriaQuery(criteria, pageable);
-        System.out.println(query.getStoredFields());
-        System.out.println(query.toString());
         if (isOrdered) {
             query.addSort(Sort.by(orderingField).ascending());
         }
@@ -97,6 +85,26 @@ public class NoteServiceImpl implements NoteService {
                 .stream()
                 .map(SearchHit::getContent)
                 .toList();
+    }
+
+    private Pageable getPageable(Integer currentPage) {
+        Pageable pageable;
+        if (currentPage != null) {
+            pageable = PageRequest.of(currentPage, PAGE_SIZE);
+        } else {
+            pageable = PageRequest.of(0, PAGE_SIZE);
+        }
+        return pageable;
+    }
+
+    private boolean isOrdered(String orderingField) {
+        boolean isOrdered = false;
+        if (orderingField != null) {
+            isOrdered = Arrays.stream(OrderFields.values())
+                    .map(Enum::name)
+                    .anyMatch(f -> f.equals(orderingField));
+        }
+        return isOrdered;
     }
 
     @Override
