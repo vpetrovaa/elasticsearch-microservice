@@ -1,5 +1,6 @@
 package com.solvd.elasticsearchmicroservice.service.impl;
 
+import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
 import com.solvd.elasticsearchmicroservice.domain.Note;
 import com.solvd.elasticsearchmicroservice.domain.criteria.NoteCriteria;
 import com.solvd.elasticsearchmicroservice.domain.criteria.OrderFields;
@@ -9,8 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.elasticsearch.client.elc.QueryBuilders;
+import org.springframework.data.elasticsearch.client.erhlc.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.Criteria;
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
 import org.springframework.data.elasticsearch.core.query.Query;
@@ -57,16 +62,16 @@ public class NoteServiceImpl implements NoteService {
     public List<Note> findByCriteriaOrdered(Integer currentPage, NoteCriteria noteCriteria,
                                             String orderingField) {
         Criteria criteria = new Criteria();
+        if (noteCriteria.getKeyWord() != null) {
+            criteria.and(Criteria.where("notes.tag.keyword")).contains(noteCriteria.getKeyWord())
+                    .or(Criteria.where("notes.theme.keyword")).contains(noteCriteria.getKeyWord())
+                    .or(Criteria.where("notes.description.keyword")).contains(noteCriteria.getKeyWord());
+        }
         if (noteCriteria.getTags() != null && !noteCriteria.getTags().isEmpty()) {
-            criteria.and(Criteria.where("tag")).in(noteCriteria.getTags());
+            criteria.and(Criteria.where("notes.tag.keyword")).in(noteCriteria.getTags());
         }
         if (noteCriteria.getThemes() != null && !noteCriteria.getThemes().isEmpty()) {
-            criteria.and(Criteria.where("theme")).in(noteCriteria.getThemes());
-        }
-        if (noteCriteria.getKeyWord() != null) {
-            criteria.and(Criteria.where("tag")).contains(noteCriteria.getKeyWord());
-            criteria.and(Criteria.where("theme")).contains(noteCriteria.getKeyWord());
-            criteria.and(Criteria.where("description")).contains(noteCriteria.getKeyWord());
+            criteria.and(Criteria.where("notes.theme.keyword")).in(noteCriteria.getThemes());
         }
         Pageable pageable;
         if (currentPage != null) {
@@ -81,11 +86,15 @@ public class NoteServiceImpl implements NoteService {
                     .anyMatch(f -> f.equals(orderingField));
         }
         Query query = new CriteriaQuery(criteria, pageable);
+        System.out.println(query.getStoredFields());
+        System.out.println(query.toString());
         if (isOrdered) {
             query.addSort(Sort.by(orderingField).ascending());
         }
-        return operations.search(query, Note.class).
-                stream()
+        SearchHits<Note> notesFiltered = operations.search(query, Note.class, IndexCoordinates.of("notes"));
+        System.out.println(notesFiltered.getTotalHits());
+        return operations.search(query, Note.class)
+                .stream()
                 .map(SearchHit::getContent)
                 .toList();
     }
