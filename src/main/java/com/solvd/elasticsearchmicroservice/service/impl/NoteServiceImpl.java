@@ -1,6 +1,5 @@
 package com.solvd.elasticsearchmicroservice.service.impl;
 
-import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
 import com.solvd.elasticsearchmicroservice.domain.Note;
 import com.solvd.elasticsearchmicroservice.domain.criteria.NoteCriteria;
 import com.solvd.elasticsearchmicroservice.domain.criteria.OrderFields;
@@ -10,8 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.elasticsearch.client.elc.QueryBuilders;
-import org.springframework.data.elasticsearch.client.erhlc.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
