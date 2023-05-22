@@ -12,7 +12,7 @@ import java.util.Map;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class KfConsumerImpl implements KfConsumer<NoteEvent> {
+public class KfNoteConsumer implements KfConsumer<NoteEvent> {
 
     private final Map<String, Handler> handlers;
 
