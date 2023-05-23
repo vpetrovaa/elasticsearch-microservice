@@ -15,7 +15,6 @@ import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.Criteria;
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
-import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -58,21 +57,11 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public List<Note> findByCriteriaOrdered(Integer currentPage, NoteCriteria noteCriteria,
                                             String orderingField) {
-        Criteria criteria = new Criteria();
-        if (noteCriteria.getKeyWord() != null) {
-            criteria.and(Criteria.where("notes.tag.keyword")).contains(noteCriteria.getKeyWord())
-                    .or(Criteria.where("notes.theme.keyword")).contains(noteCriteria.getKeyWord())
-                    .or(Criteria.where("notes.description.keyword")).contains(noteCriteria.getKeyWord());
-        }
-        if (noteCriteria.getTags() != null && !noteCriteria.getTags().isEmpty()) {
-            criteria.and(Criteria.where("notes.tag.keyword")).in(noteCriteria.getTags());
-        }
-        if (noteCriteria.getThemes() != null && !noteCriteria.getThemes().isEmpty()) {
-            criteria.and(Criteria.where("notes.theme.keyword")).in(noteCriteria.getThemes());
-        }
+        CriteriaQuery query = new CriteriaQuery(new Criteria());
+        noteCriteria.apply(query);
         Pageable pageable = getPageable(currentPage);
+        query.setPageable(pageable);
         boolean isOrdered = isOrdered(orderingField);
-        Query query = new CriteriaQuery(criteria, pageable);
         if (isOrdered) {
             query.addSort(Sort.by(orderingField).ascending());
         }
