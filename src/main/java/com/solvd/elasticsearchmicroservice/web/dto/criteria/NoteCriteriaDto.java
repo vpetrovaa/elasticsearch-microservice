@@ -1,14 +1,15 @@
 package com.solvd.elasticsearchmicroservice.web.dto.criteria;
 
+import com.solvd.elasticsearchmicroservice.domain.criteria.field.KeyWord;
+import com.solvd.elasticsearchmicroservice.domain.criteria.field.Tag;
+import com.solvd.elasticsearchmicroservice.domain.criteria.field.Theme;
 import lombok.Data;
-
-import java.util.List;
 
 @Data
 public class NoteCriteriaDto {
 
-    private String keyWord;
-    private List<String> themes;
-    private List<String> tags;
+    private KeyWord keyWord;
+    private Theme theme;
+    private Tag tag;
 
 }

@@ -65,8 +65,6 @@ public class NoteServiceImpl implements NoteService {
         if (isOrdered) {
             query.addSort(Sort.by(orderingField).ascending());
         }
-        SearchHits<Note> notesFiltered = operations.search(query, Note.class, IndexCoordinates.of("notes"));
-        System.out.println(notesFiltered.getTotalHits());
         return operations.search(query, Note.class)
                 .stream()
                 .map(SearchHit::getContent)

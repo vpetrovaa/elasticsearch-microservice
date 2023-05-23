@@ -5,7 +5,7 @@ import org.springframework.data.elasticsearch.core.query.Criteria;
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
 
 @Data
-public class KyeWord implements Field {
+public class KeyWord implements Field {
 
     private String keyWord;
 
