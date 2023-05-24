@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 public class Theme implements Field {
 
-    List<String> themes;
+    private List<String> themes;
 
     @Override
     public void apply(CriteriaQuery query) {
