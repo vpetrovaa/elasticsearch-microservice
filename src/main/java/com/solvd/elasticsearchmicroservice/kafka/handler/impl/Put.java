@@ -7,9 +7,9 @@ import com.solvd.elasticsearchmicroservice.service.NoteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-@Component("POST")
+@Component("PUT")
 @RequiredArgsConstructor
-public class PostHandlerImpl implements Handler {
+public class Put implements Handler {
 
     private final NoteService noteService;
 
@@ -21,7 +21,7 @@ public class PostHandlerImpl implements Handler {
         note.setDescription(event.getDescription());
         note.setTheme(event.getTheme());
         note.setUserId(event.getUserId());
-        noteService.create(note);
+        noteService.update(note);
     }
 
 }
