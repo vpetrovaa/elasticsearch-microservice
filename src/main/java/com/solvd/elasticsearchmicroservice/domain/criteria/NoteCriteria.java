@@ -12,7 +12,7 @@ import java.util.Objects;
 @AllArgsConstructor
 public class NoteCriteria {
 
-    private List<Field> fields;
+    private final List<Field> fields;
 
     public void apply(CriteriaQuery query) {
         fields.stream()
