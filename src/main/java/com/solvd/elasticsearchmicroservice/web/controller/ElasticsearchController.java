@@ -1,6 +1,7 @@
 package com.solvd.elasticsearchmicroservice.web.controller;
 
 import com.solvd.elasticsearchmicroservice.domain.Note;
+import com.solvd.elasticsearchmicroservice.repository.NoteRepository;
 import com.solvd.elasticsearchmicroservice.service.NoteService;
 import com.solvd.elasticsearchmicroservice.web.dto.NoteDto;
 import com.solvd.elasticsearchmicroservice.web.dto.criteria.NoteCriteriaDto;
@@ -8,12 +9,7 @@ import com.solvd.elasticsearchmicroservice.web.mapper.NoteCriteriaMapper;
 import com.solvd.elasticsearchmicroservice.web.mapper.NoteMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
