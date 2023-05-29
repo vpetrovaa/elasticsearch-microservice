@@ -55,7 +55,7 @@ services:
     image: docker.elastic.co/logstash/logstash:8.5.3
     volumes:
       - ./logs:/usr/share/logstash/logs
-      - ./logstash/:/usr/share/logstash/pipeline/
+      - ./logstash/:/usr/share/logstash/
     ports:
       - 5044:5044
       - 50000:50000/tcp

@@ -30,7 +30,6 @@ public class NoteServiceImpl implements NoteService {
 
     private static final Logger log = LoggerFactory.getLogger(NoteService.class);
 
-
     private final NoteRepository noteRepository;
     private final ElasticsearchOperations operations;
 
