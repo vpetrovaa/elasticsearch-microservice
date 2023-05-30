@@ -8,12 +8,6 @@ spring:
     main:
       allow-bean-definition-overriding: true
 
-eureka:
-  client:
-    service-url:
-      defaultZone: http://${EUREKA_HOST}:8761/eureka
-
-
 kafka:
   topic: notes
   group: json
@@ -22,4 +16,11 @@ kafka:
 elastic:
   host: ${ELASTIC_HOST}
   port: 9200
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - prometheus
 

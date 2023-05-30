@@ -1,0 +1,100 @@
+services:
+  prometheus:
+    image: prom/prometheus:v2.35.0
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus:/etc/prometheus/
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - 9090:9090
+    networks:
+      - notes
+  grafana:
+    image: grafana/grafana-oss:8.5.2
+    pull_policy: always
+    container_name: grafana
+    restart: unless-stopped
+    user: root
+    ports:
+      - 3000:3000
+    volumes:
+      - ./data/grafana:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_DOMAIN=localhost
+      - GF_LOG_MODE=console file
+      - GF_LOG_FILTERS=alerting.notifier.slack:debug alertmanager:debug ngalert:debug
+    networks:
+      - notes
+  elasticsearch:
+    image: elasticsearch:8.5.3
+    container_name: elasticsearch
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+    networks:
+      - notes
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:8.5.3
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    ports:
+      - "5601:5601"
+    networks:
+      - notes
+  logstash:
+    container_name: logstash
+    image: docker.elastic.co/logstash/logstash:8.5.3
+    volumes:
+      - ./logs:/usr/share/logstash/logs
+      - ./logstash/:/usr/share/logstash/
+    ports:
+      - 5044:5044
+      - 50000:50000/tcp
+      - 50000:50000/udp
+      - 9600:9600
+    environment:
+      LS_JAVA_OPTS: -Xms256m -Xmx256m
+    networks:
+      - notes
+    depends_on:
+      - elasticsearch
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "22181:2181"
+    networks:
+      - notes
+  kafka:
+    image: confluentinc/cp-kafka:7.3.0
+    container_name: kafka
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    networks:
+      - notes
+networks:
+  notes:
+    driver: bridge
